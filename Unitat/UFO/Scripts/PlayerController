@@ -1,0 +1,72 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PlayerController : MonoBehaviour
+{
+    //Variables
+    private Rigidbody2D rb2d;
+    private int count;
+    private float auxDelay;
+
+    public int speed;
+    public int dashForce;
+    public float dashDelay;
+
+    public Text countText;
+    public Text winText;
+
+    //Main Functions
+    private void Start()
+    {
+        rb2d = GetComponent<Rigidbody2D>();
+        count = 0;
+        winText.text = "";
+        int auxDelay=dashDelay;
+        SetCountText();
+    }
+    private void FixedUpdate()
+    {
+        // Get the user's input
+        float hrzInput = Input.GetAxis("Horizontal");
+        float frwdInput = Input.GetAxis("Vertical");
+        Vector2 movement = new Vector2(hrzInput, frwdInput);
+        rb2d.AddForce(movement * speed);
+        if (Input.GetKeyDown(KeyCode.Space) && (dashDelay<=0))
+        {
+            Dash(movement);
+        }
+        dashDelay -= Time.deltaTime;
+    }
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("PickUp"))
+        {
+            other.gameObject.SetActive(false);
+            count ++;
+            SetCountText();
+        }
+    }
+
+    //Auxiliary Functions
+    void SetCountText()
+    {
+        countText.text = "Count: " + count.ToString();
+        if(count >= 12)
+        {
+            winText.text = "You Win!";
+        }
+        ResetDash();
+    }
+    void ResetDash()
+    {
+        dashDelay = auxDelay;
+    }
+    void Dash(Vector2 movement)
+    {
+        //Dash on direction where vector is pointing
+        rb2d.AddForce(movement * dashForce, ForceMode2D.Impulse);
+        ResetDash();
+    }
+}
