@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         count = 0;
         winText.text = "";
-        int auxDelay=dashDelay;
+        auxDelay = dashDelay;
         SetCountText();
     }
     private void FixedUpdate()
@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
         float frwdInput = Input.GetAxis("Vertical");
         Vector2 movement = new Vector2(hrzInput, frwdInput);
         rb2d.AddForce(movement * speed);
-        if (Input.GetKeyDown(KeyCode.Space) && (dashDelay<=0))
+        if (Input.GetKeyDown(KeyCode.Space) && (dashDelay <= 0))
         {
             Dash(movement);
         }
@@ -44,7 +44,7 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("PickUp"))
         {
             other.gameObject.SetActive(false);
-            count ++;
+            count++;
             SetCountText();
         }
     }
@@ -53,20 +53,25 @@ public class PlayerController : MonoBehaviour
     void SetCountText()
     {
         countText.text = "Count: " + count.ToString();
-        if(count >= 12)
+        if (count >= 12)
         {
             winText.text = "You Win!";
         }
-        ResetDash();
+        dashDelay = ResetDash();
     }
-    void ResetDash()
+    float ResetDash()
     {
-        dashDelay = auxDelay;
+        return this.auxDelay;
     }
     void Dash(Vector2 movement)
     {
-        //Dash on direction where vector is pointing
-        rb2d.AddForce(movement * dashForce, ForceMode2D.Impulse);
-        ResetDash();
+
+        // Apply a dash by increasing velocity, then smoothly reduce it
+        rb2d.velocity += movement.normalized * dashForce;
+
+        // Optionally, you can add a coroutine to smoothly reduce velocity if needed
+        // But since velocity is updated in FixedUpdate, it will naturally slow down due to physics drag
+
+        this.dashDelay = ResetDash();
     }
 }
