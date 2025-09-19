@@ -7,24 +7,22 @@ public class PlayerController : MonoBehaviour
 {
     //Variables
     private Rigidbody2D rb2d;
-    private int count;
-    private float auxDelay;
+    //private int count;
+    //private Text countText;
 
     public int speed;
     public int dashForce;
     public float dashDelay;
-
-    public Text countText;
-    public Text winText;
+    public float auxDelay;
 
     //Main Functions
     private void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        count = 0;
-        winText.text = "";
+        //this.count = 0;
+        //winText.text = "";
         auxDelay = dashDelay;
-        SetCountText();
+        //SetCountText();
     }
     private void FixedUpdate()
     {
@@ -33,13 +31,13 @@ public class PlayerController : MonoBehaviour
         float frwdInput = Input.GetAxis("Vertical");
         Vector2 movement = new Vector2(hrzInput, frwdInput);
         rb2d.AddForce(movement * speed);
-        if (Input.GetKeyDown(KeyCode.Space) && (dashDelay <= 0))
+        if (Input.GetKeyDown(KeyCode.Space) && (auxDelay <= 0))
         {
             Dash(movement);
         }
-        dashDelay -= Time.deltaTime;
+        this.auxDelay -= Time.deltaTime;
     }
-    private void OnTriggerEnter2D(Collider2D other)
+   /* private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.CompareTag("PickUp"))
         {
@@ -47,10 +45,10 @@ public class PlayerController : MonoBehaviour
             count++;
             SetCountText();
         }
-    }
+    }*/
 
     //Auxiliary Functions
-    void SetCountText()
+  /*  void SetCountText()
     {
         countText.text = "Count: " + count.ToString();
         if (count >= 12)
@@ -58,20 +56,20 @@ public class PlayerController : MonoBehaviour
             winText.text = "You Win!";
         }
         dashDelay = ResetDash();
-    }
+    }*/
     float ResetDash()
     {
-        return this.auxDelay;
+        return this.dashDelay;
     }
     void Dash(Vector2 movement)
     {
 
         // Apply a dash by increasing velocity, then smoothly reduce it
-        rb2d.velocity += movement.normalized * dashForce;
+        rb2d.linearVelocity += movement.normalized * dashForce;
 
         // Optionally, you can add a coroutine to smoothly reduce velocity if needed
         // But since velocity is updated in FixedUpdate, it will naturally slow down due to physics drag
 
-        this.dashDelay = ResetDash();
+        this.auxDelay = ResetDash();
     }
 }
